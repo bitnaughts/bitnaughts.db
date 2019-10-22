@@ -12,112 +12,84 @@ using System.Threading.Tasks;
 public static class DatabaseHandler {
 
     public const string URL = "https://bitnaughts.azurewebsites.net/api/";
+    public static HttpClient client = new HttpClient ();
 
-    public static async Task<string> Post (string endpoint, Dictionary<string, string> parameters) {
-        string responseInString = "";
-        HttpClient client = new HttpClient ();
-        HttpResponseMessage response = await client.PostAsync (
-            URL + endpoint,
-            new StringContent (
-                JSONHandler.ToJSON (parameters)
-            )
+    public const bool LOAD_FROM_DATABASE = false;
+
+    public static async Task<string> Post (string endpoint, Dictionary<string, string> parameters_dict, string json) {
+        return await Post (
+            endpoint + JSONHandler.ToParameters (parameters_dict),
+            json
         );
-        return await response.Content.ReadAsStringAsync ();
-
-        // response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-        // response.EnsureSuccessStatusCode();
-
-        // using (var wb = new WebClient ()) {
-        //     string full_endpoint = URL + endpoint;
-        //     var data = new NameValueCollection ();
-        //     data["values"] = new string[];
-
-        //     foreach (KeyValuePair<string, string> pair in parameters) {
-        //         data["values"] += pair.Value;
-        //     }
-
-        //     var response = wb.UploadValues (full_endpoint, "post", data);
-        //     responseInString = Encoding.UTF8.GetString (response);
-        // }
-        // return responseInString;
     }
-
-    public static string Get (string endpoint, Dictionary<string, string> parameters) {
-
-        string full_endpoint = URL + endpoint + "?";
-        List<string> parameter_pairs = new List<string> ();
-
-        foreach (KeyValuePair<string, string> pair in parameters) {
-            parameter_pairs.Add (pair.Key + "=" + pair.Value);
+    public static async Task<string> Post (string endpoint, string json) {
+        try {
+            HttpResponseMessage response = await client.PostAsync (
+                URL + endpoint,
+                new StringContent (json)
+            );
+            response.EnsureSuccessStatusCode ();
+            return await response.Content.ReadAsStringAsync ();
+        } catch (Exception ex) {
+            return ex.ToString ();
         }
-
-        full_endpoint += String.Join (
-            "&",
-            parameter_pairs.ToArray ()
-        );
-
-        return Get (full_endpoint);
     }
 
-    public static string Get (string endpoint) {
-        string response = "";
-        using (var client = new WebClient ()) {
-            response = client.DownloadString (endpoint);
+    public static async Task<string> Get (string endpoint, Dictionary<string, string> parameters_dict) {
+        return await Get (
+            endpoint + JSONHandler.ToParameters (parameters_dict)
+        );
+    }
+
+    public static async Task<string> Get (string endpoint) {
+        try {
+            HttpResponseMessage response = await client.GetAsync (
+                URL + endpoint
+            );
+            response.EnsureSuccessStatusCode ();
+            return await response.Content.ReadAsStringAsync ();
+        } catch (Exception ex) {
+            return ex.ToString ();
         }
-        return response;
     }
 
-    public static string Create (GalaxyObject galaxy) {
-        Task<string> call = Post (
-            "create?table=Galaxies",
-            new Dictionary<string, string> { { "id", galaxy.id.ToString () },
-                { "seed", galaxy.seed.ToString () }
-            }
+    public static async Task<string> Create (GalaxyObject galaxy) {
+        return await Post (
+            "create",
+            new Dictionary<string, string> { { "flag", "reset" } },
+            galaxy.ToString ()
         );
-        call.Wait ();
-        return call.Result;
     }
-    public static string Create (SystemObject system) {
-        Task<string> call = Post (
-            "create?table=Systems",
-            new Dictionary<string, string> { { "id", system.id.ToString () },
-                { "seed", system.seed.ToString () }
-            }
+
+    public static async Task<string> Create (SystemObject system) {
+        return await Post (
+            "create",
+            new Dictionary<string, string> { { "table", "Systems" } },
+            system.ToString ()
         );
-        call.Wait ();
-        return call.Result;
     }
-    public static string Create (PlanetObject planet) {
-        Task<string> call = Post (
-            "create?table=Planets",
-            new Dictionary<string, string> { { "id", planet.id.ToString () },
-                { "seed", planet.seed.ToString () }
-            }
+
+    public static async Task<string> Create (PlanetObject planet) {
+        return await Post (
+            "create",
+            new Dictionary<string, string> { { "table", "Planets" } },
+            planet.ToString ()
         );
-        call.Wait ();
-        return call.Result;
     }
-    public static string Create (CelestialObject asteroid) {
-        Task<string> call = Post (
-            "create?table=Asteroids",
-            new Dictionary<string, string> { { "id", asteroid.id.ToString () },
-                { "seed", asteroid.seed.ToString () },
-                { "size", asteroid.hitpoints.ToString () }
-            }
+
+    public static async Task<string> Create (CelestialObject asteroid) {
+        return await Post (
+            "create",
+            new Dictionary<string, string> { { "table", "Asteroids" } },
+            asteroid.ToString ()
         );
-        call.Wait ();
-        return call.Result;
     }
-    public static string Create (ShipObject ship) {
-        Task<string> call = Post (
-            "create?table=Ships",
-            new Dictionary<string, string> { { "id", ship.id.ToString () },
-                { "seed", ship.seed.ToString () },
-                { "position_x", ship.motion_handler.position.X.ToString () },
-                { "position_y", ship.motion_handler.position.Y.ToString () }
-            }
+
+    public static async Task<string> Create (ShipObject ship) {
+        return await Post (
+            "create",
+            new Dictionary<string, string> { { "table", "Ships" } },
+            ship.ToString ()
         );
-        call.Wait ();
-        return call.Result;
     }
 }
