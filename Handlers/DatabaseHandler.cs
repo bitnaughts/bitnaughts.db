@@ -11,11 +11,39 @@ using System.Threading.Tasks;
 
 public static class DatabaseHandler {
 
+    public const bool LOAD_FROM_DATABASE = true;
+
     public const string URL = "https://bitnaughts.azurewebsites.net/api/";
+
+    /* Endpoints */
+    public const string GET = "get",
+        SET = "set";
+
+    /* Parameter Flags */
+    public const string FLAG = "flag",
+        RESET = "reset",
+        TYPE = "type",
+        ID = "id";
+
     public static HttpClient client = new HttpClient ();
 
-    public const bool LOAD_FROM_DATABASE = false;
+    public static async Task<string> Get<T> (int id) {
+        return await Get (
+            GET,
+            new Dictionary<string, string> { { TYPE, typeof (T).ToString () },
+                { ID, id.ToString () }
+            }
+        );
+    }
+    public static async Task<string> Set<T> (T obj) {
+        return await Post (
+            SET,
+            new Dictionary<string, string> { { TYPE, typeof (T).ToString () } },
+            obj.ToString ()
+        );
+    }
 
+    /* HTTP Post Logic with System.Net.Http */
     public static async Task<string> Post (string endpoint, Dictionary<string, string> parameters_dict, string json) {
         return await Post (
             endpoint + JSONHandler.ToParameters (parameters_dict),
@@ -35,12 +63,12 @@ public static class DatabaseHandler {
         }
     }
 
+    /* HTTP Get Logic with System.Net.Http */
     public static async Task<string> Get (string endpoint, Dictionary<string, string> parameters_dict) {
         return await Get (
             endpoint + JSONHandler.ToParameters (parameters_dict)
         );
     }
-
     public static async Task<string> Get (string endpoint) {
         try {
             HttpResponseMessage response = await client.GetAsync (
@@ -53,43 +81,4 @@ public static class DatabaseHandler {
         }
     }
 
-    public static async Task<string> Create (GalaxyObject galaxy) {
-        return await Post (
-            "create",
-            new Dictionary<string, string> { { "flag", "reset" } },
-            galaxy.ToString ()
-        );
-    }
-
-    public static async Task<string> Create (SystemObject system) {
-        return await Post (
-            "create",
-            new Dictionary<string, string> { { "table", "Systems" } },
-            system.ToString ()
-        );
-    }
-
-    public static async Task<string> Create (PlanetObject planet) {
-        return await Post (
-            "create",
-            new Dictionary<string, string> { { "table", "Planets" } },
-            planet.ToString ()
-        );
-    }
-
-    public static async Task<string> Create (CelestialObject asteroid) {
-        return await Post (
-            "create",
-            new Dictionary<string, string> { { "table", "Asteroids" } },
-            asteroid.ToString ()
-        );
-    }
-
-    public static async Task<string> Create (ShipObject ship) {
-        return await Post (
-            "create",
-            new Dictionary<string, string> { { "table", "Ships" } },
-            ship.ToString ()
-        );
-    }
 }
