@@ -7,7 +7,7 @@
     [a_size] INT NULL,
     [a_density] INT NULL,
     [a_composition] VARCHAR(20) NULL,
-    [a_is_mineable] BOOL NULL,
-    [a_is_regenerating] BOOL NULL,
+    [a_is_mineable] BOOLEAN NULL,
+    [a_is_regenerating] BOOLEAN NULL,
     [a_seed] INT NULL
 )
