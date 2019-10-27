@@ -10,7 +10,7 @@ public static class Database {
                 GALAXY_ID = "s_galaxy_id",
                 SEED = "s_seed";
         }
-        public static SystemConnections {
+        public static class SystemConnections {
             public const string SYSTEM_START = "sc_system_1_id",
                 SYSTEM_END = "sc_system_2_id",
                 TRAVEL_COST = "sc_travel_cost";
