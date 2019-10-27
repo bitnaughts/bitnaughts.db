@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Mines]
 (
-	[m_ship_id] INT NOT NULL, 
+	[m_ship_id] INT NOT NULL,
     [m_asteroid_id] INT NOT NULL,
     [m_amount] INT NOT NULL,
     [m_date] DATETIME NOT NULL,
