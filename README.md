@@ -1,1 +1,3 @@
-# BitNaughts' Database
+# BitNaughts Git Database
+
+
